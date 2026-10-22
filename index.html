@@ -1,0 +1,204 @@
+<!DOCTYPE html>
+<html lang="es"><head><meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
+<title>Mapa mundial: Industria 4.0 vs 5.0</title>
+<style>
+:root{--bg:#fff;--fg:#1a1a1a;--mut:#555;--card:#f4f5f7;--bd:#d0d4da;--ac:#1f5fbf;box-sizing:border-box;padding-top:env(safe-area-inset-top,0px);padding-bottom:env(safe-area-inset-bottom,0px)}
+@media (prefers-color-scheme:dark){:root:not([data-theme="light"]){--bg:#15181d;--fg:#eceef1;--mut:#a9afb8;--card:#1f242b;--bd:#39414b;--ac:#7fb0ff}}
+*{box-sizing:border-box}body{margin:0;background:var(--bg);color:var(--fg);font:15px/1.45 system-ui,sans-serif}
+header,section,footer{padding:12px 16px;max-width:1300px;margin:auto}
+h1{font-size:1.4rem;margin:.2em 0}h2{font-size:1.1rem}
+.demo{background:#fff3cd;color:#5c4400;border:1px solid #e0b800;padding:8px 12px;border-radius:6px;font-size:.9rem}
+.ctl{display:flex;flex-wrap:wrap;gap:10px;align-items:end;background:var(--card);padding:10px;border-radius:8px}
+.ctl label{display:flex;flex-direction:column;font-size:.8rem;color:var(--mut)}
+select,input,button{font:inherit;padding:5px 8px;border:1px solid var(--bd);border-radius:6px;background:var(--bg);color:var(--fg)}
+button{cursor:pointer}button:focus-visible,select:focus-visible,input:focus-visible,th:focus-visible{outline:3px solid var(--ac)}
+#wrap{display:grid;grid-template-columns:1fr 330px;gap:12px;margin-top:10px}
+@media(max-width:850px){#wrap{grid-template-columns:1fr}}
+#map{position:relative;width:100%;height:520px;background:var(--card);border-radius:8px;overflow:hidden}
+#panel{background:var(--card);border-radius:8px;padding:12px;max-height:520px;overflow:auto}
+#tip{position:fixed;pointer-events:none;background:#111;color:#fff;padding:8px 10px;border-radius:6px;font-size:.8rem;display:none;z-index:9;max-width:260px}
+#legend{display:flex;flex-wrap:wrap;gap:10px;align-items:center;margin:8px 0;font-size:.85rem}
+.sw{display:inline-block;width:16px;height:12px;border:1px solid #888;vertical-align:middle;margin-right:4px}
+.bar{height:14px;background:var(--bd);border-radius:4px;margin:2px 0 8px}.bar i{display:block;height:100%;border-radius:4px}
+.tag{font-size:.7rem;background:#fff3cd;color:#5c4400;padding:1px 6px;border-radius:4px;border:1px solid #e0b800}
+.tw{overflow-x:auto;max-height:420px}table{border-collapse:collapse;width:100%;font-size:.85rem}
+th,td{border-bottom:1px solid var(--bd);padding:4px 8px;text-align:left;white-space:nowrap}th{cursor:pointer;position:sticky;top:0;background:var(--card)}
+</style></head><body>
+<header>
+<h1>Industria 4.0 vs Industria 5.0 — mapa mundial interactivo</h1>
+<div class="demo" role="note"><b>DATOS DEMO:</b> solo 25 países tienen valores <b>ilustrativos</b> (no oficiales). Los demás aparecen como «Sin datos». Carga tu CSV real con el botón «Cargar CSV» (ver Metodología).</div>
+</header>
+<section>
+<div class="ctl" role="search">
+<label>Capa<select id="layer"><option value="i40">Industria 4.0</option><option value="i50">Industria 5.0</option><option value="cmp">Comparación 4.0 vs 5.0</option></select></label>
+<label>Buscar país<input id="q" list="names" placeholder="Ej. Alemania"><datalist id="names"></datalist></label>
+<label>Región<select id="freg"><option value="">Todas</option></select></label>
+<label>Adopción<select id="fad"><option value="">Todas</option><option>Consolidada</option><option>Emergente</option><option>Incipiente</option><option>Sin evidencia</option><option>Sin datos</option></select></label>
+<label>Madurez mínima: <b id="mv">0</b><input id="fmat" type="range" min="0" max="100" value="0"></label>
+<label>Año<select id="fyr"><option value="">Todos</option></select></label>
+<button id="zin">＋</button><button id="zout">−</button><button id="zrs">Restablecer</button>
+<button id="csv">Exportar CSV</button><button id="png">Exportar PNG</button>
+<label>Cargar CSV<input type="file" id="up" accept=".csv"></label>
+</div>
+<div id="legend" aria-live="polite"></div>
+<div id="wrap"><div id="map" role="img" aria-label="Mapa coroplético mundial; la tabla inferior contiene los mismos datos"></div>
+<aside id="panel" aria-live="polite"><h2>Ficha del país</h2><p>Haz clic en un país del mapa o de la tabla.</p></aside></div>
+<div id="tip"></div>
+</section>
+<section><h2>Ranking / tabla (clic en el encabezado para ordenar)</h2><div class="tw"><table id="tbl"></table></div></section>
+<section><h2>Metodología</h2>
+<p><b>Presencia/adopción</b> (Consolidada, Emergente, Incipiente, Sin evidencia, Sin datos) y <b>madurez</b> (0-100) son campos distintos: un país puede tener presencia «Emergente» y madurez baja o media. <b>Desarrollo general</b> = IDH (PNUD). Industria 4.0: digitalización, IoT, nube, big data, IA, robótica, ciberseguridad, conectividad. Industria 5.0: colaboración humano-máquina, cobots, IA centrada en humanos, sostenibilidad, resiliencia, personalización, capital humano, I+D. Comparación: Δ = madurez 5.0 − madurez 4.0 (naranja: 4.0 más madura; morado: 5.0 más madura).</p>
+<p><b>Cómo reemplazar datos:</b> sube un CSV con columnas <code>iso3,a40,m40,a50,m50,idh,anio,fuente,estado,confianza</code>. a40/a50 = Consolidada|Emergente|Incipiente|Sin evidencia; m40/m50 = 0-100; estado = Oficial|Estimado|DEMO; confianza = Alta|Media|Baja. O edita la constante <code>DEMO_CSV</code> en el código.</p>
+<h2>Fuentes recomendadas</h2>
+<table><tr><th>Fuente</th><th>Uso previsto</th></tr>
+<tr><td>PNUD – Índice de Desarrollo Humano</td><td>Desarrollo general</td></tr>
+<tr><td>Banco Mundial (WDI, grupos de ingreso)</td><td>Desarrollo general, conectividad, I+D</td></tr>
+<tr><td>UNIDO – Competitive Industrial Performance</td><td>Capacidad industrial (4.0)</td></tr>
+<tr><td>IFR – World Robotics</td><td>Densidad de robots (4.0 y cobots 5.0)</td></tr>
+<tr><td>UIT – ICT Development Index; OECD; WEF (Readiness for the Future of Production)</td><td>Conectividad, readiness</td></tr>
+<tr><td>Eurostat / UNESCO UIS</td><td>I+D, capital humano (5.0)</td></tr></table>
+<h2>Limitaciones</h2>
+<p>No existe un índice oficial global de Industria 5.0; cualquier valor es un <b>proxy Estimado</b> y debe llevar fuente, año y confianza. Los valores DEMO son ilustrativos y no deben citarse. El mapa base omite algunos estados muy pequeños; todos figuran en la tabla.</p></section>
+
+<script src="https://cdnjs.cloudflare.com/ajax/libs/d3/3.5.17/d3.min.js"></script>
+<script src="https://cdnjs.cloudflare.com/ajax/libs/topojson/1.6.9/topojson.min.js"></script>
+<script src="https://cdnjs.cloudflare.com/ajax/libs/datamaps/0.5.9/datamaps.world.min.js"></script>
+<script>
+/* ===== 1. DATOS ===== */
+// Países: ISO3 + ISO2 + región (1 África, 2 América, 3 Asia, 4 Europa, 5 Oceanía). El nombre en español sale de Intl.DisplayNames.
+const REG={1:'África',2:'América',3:'Asia',4:'Europa',5:'Oceanía'};
+const LIST=`DZADZ1 AGOAO1 BENBJ1 BWABW1 BFABF1 BDIBI1 CPVCV1 CMRCM1 CAFCF1 TCDTD1 COMKM1 COGCG1 CODCD1 CIVCI1 DJIDJ1 EGYEG1 GNQGQ1 ERIER1 SWZSZ1 ETHET1 GABGA1 GMBGM1 GHAGH1 GINGN1 GNBGW1 KENKE1 LSOLS1 LBRLR1 LBYLY1 MDGMG1 MWIMW1 MLIML1 MRTMR1 MUSMU1 MARMA1 MOZMZ1 NAMNA1 NERNE1 NGANG1 RWARW1 STPST1 SENSN1 SYCSC1 SLESL1 SOMSO1 ZAFZA1 SSDSS1 SDNSD1 TZATZ1 TGOTG1 TUNTN1 UGAUG1 ZMBZM1 ZWEZW1
+ATGAG2 ARGAR2 BHSBS2 BRBBB2 BLZBZ2 BOLBO2 BRABR2 CANCA2 CHLCL2 COLCO2 CRICR2 CUBCU2 DMADM2 DOMDO2 ECUEC2 SLVSV2 GRDGD2 GTMGT2 GUYGY2 HTIHT2 HNDHN2 JAMJM2 MEXMX2 NICNI2 PANPA2 PRYPY2 PERPE2 KNAKN2 LCALC2 VCTVC2 SURSR2 TTOTT2 USAUS2 URYUY2 VENVE2
+AFGAF3 ARMAM3 AZEAZ3 BHRBH3 BGDBD3 BTNBT3 BRNBN3 KHMKH3 CHNCN3 CYPCY3 GEOGE3 INDIN3 IDNID3 IRNIR3 IRQIQ3 ISRIL3 JPNJP3 JORJO3 KAZKZ3 KWTKW3 KGZKG3 LAOLA3 LBNLB3 MYSMY3 MDVMV3 MNGMN3 MMRMM3 NPLNP3 PRKKP3 OMNOM3 PAKPK3 PHLPH3 QATQA3 KORKR3 SAUSA3 SGPSG3 LKALK3 SYRSY3 TJKTJ3 THATH3 TLSTL3 TURTR3 TKMTM3 AREAE3 UZBUZ3 VNMVN3 YEMYE3 PSEPS3
+ALBAL4 ANDAD4 AUTAT4 BLRBY4 BELBE4 BIHBA4 BGRBG4 HRVHR4 CZECZ4 DNKDK4 ESTEE4 FINFI4 FRAFR4 DEUDE4 GRCGR4 HUNHU4 ISLIS4 IRLIE4 ITAIT4 LVALV4 LIELI4 LTULT4 LUXLU4 MLTMT4 MDAMD4 MCOMC4 MNEME4 NLDNL4 MKDMK4 NORNO4 POLPL4 PRTPT4 ROURO4 RUSRU4 SMRSM4 SRBRS4 SVKSK4 SVNSI4 ESPES4 SWESE4 CHECH4 UKRUA4 GBRGB4 VATVA4
+AUSAU5 FJIFJ5 KIRKI5 MHLMH5 FSMFM5 NRUNR5 NZLNZ5 PLWPW5 PNGPG5 WSMWS5 SLBSB5 TONTO5 TUVTV5 VUTVU5`;
+// DEMO ilustrativo. Formato: iso3,a40,m40,a50,m50,idh  (C=Consolidada E=Emergente I=Incipiente N=Sin evidencia)
+// REEMPLAZAR por datos reales (o usar el botón «Cargar CSV»).
+const DEMO_CSV=`iso3,a40,m40,a50,m50,idh
+DEU,C,82,C,74,0.95
+USA,C,84,C,70,0.93
+JPN,C,83,C,72,0.92
+KOR,C,85,C,68,0.93
+SGP,C,88,C,71,0.94
+SWE,C,80,C,78,0.95
+FRA,C,72,C,62,0.91
+GBR,C,74,C,60,0.94
+CHN,C,76,E,52,0.79
+ESP,C,66,E,50,0.91
+ITA,C,64,E,48,0.91
+ARE,C,70,E,45,0.94
+TUR,E,52,E,34,0.86
+BRA,E,48,I,28,0.76
+MEX,E,45,I,26,0.78
+IND,E,42,I,24,0.64
+ARG,E,40,I,22,0.85
+ZAF,E,38,I,20,0.72
+COL,E,38,I,20,0.77
+CHL,E,46,I,25,0.86
+EGY,I,30,I,15,0.73
+PER,I,30,I,14,0.76
+KEN,I,24,N,9,0.60
+NGA,I,22,N,8,0.55
+ETH,I,15,N,5,0.49`;
+
+/* ===== 2. ESTADO ===== */
+const AD={C:'Consolidada',E:'Emergente',I:'Incipiente',N:'Sin evidencia'};
+const NOD='#9e9e9e',OFF='#e6e6e6';
+const es=new Intl.DisplayNames(['es'],{type:'region'});
+const COUNTRIES=LIST.split(/\s+/).map(x=>{let n;try{n=es.of(x.slice(3,5))}catch(e){n=x.slice(0,3)}return{id:x.slice(0,3),n,r:REG[x[5]]}}).sort((a,b)=>a.n.localeCompare(b.n,'es'));
+let DATA={},sel=null;
+function parseCSV(t){DATA={};const L=t.trim().split(/\r?\n/),H=L.shift().split(',').map(s=>s.trim());
+ L.forEach(l=>{const c=l.split(','),o={};H.forEach((h,i)=>o[h]=(c[i]||'').trim());
+  const a=v=>AD[v]||v||'Sin datos',m=v=>v===''?null:+v;
+  DATA[o.iso3]={a4:a(o.a40),m4:m(o.m40),a5:a(o.a50),m5:m(o.m50),idh:o.idh?+o.idh:null,yr:o.anio||'2024',
+   src:o.fuente||'DEMO – ilustrativo (reemplazar)',st:o.estado||'DEMO',conf:o.confianza||'N/A'}})}
+parseCSV(DEMO_CSV);
+
+/* ===== 3. COLORES ===== */
+const seq=d3.scale.linear().domain([0,50,100]).range(['#fff7bc','#41b6c4','#0c2c84']);      // madurez
+const div=d3.scale.linear().domain([-50,0,50]).range(['#e66101','#f7f7f7','#5e3c99']);     // Δ 5.0−4.0
+const $=id=>document.getElementById(id);
+const delta=d=>d&&d.m4!=null&&d.m5!=null?d.m5-d.m4:null;
+function passes(c,d){if($('freg').value&&c.r!==$('freg').value)return false;
+ const L=$('layer').value,fa=$('fad').value,mm=+$('fmat').value;
+ if($('fyr').value&&(!d||d.yr!==$('fyr').value))return false;
+ const A=L=='i40'?[d&&d.a4]:L=='i50'?[d&&d.a5]:[d&&d.a4,d&&d.a5];
+ if(fa&&!A.some(x=>(x||'Sin datos')===fa))return false;
+ if(mm>0){const M=L=='i40'?[d&&d.m4]:L=='i50'?[d&&d.m5]:[d&&d.m4,d&&d.m5];if(!M.some(x=>x!=null&&x>=mm))return false}
+ return true}
+function colorOf(c){const d=DATA[c.id],L=$('layer').value;if(!d)return NOD;
+ const v=L=='i40'?d.m4:L=='i50'?d.m5:delta(d);if(v==null)return NOD;
+ if(!passes(c,d))return OFF;return L=='cmp'?div(v):seq(v)}
+
+/* ===== 4. MAPA ===== */
+let zoom,map;
+function initMap(){$('map').innerHTML='';
+ map=new Datamap({element:$('map'),projection:'mercator',fills:{defaultFill:NOD},
+  geographyConfig:{popupOnHover:false,highlightFillColor:null,highlightBorderColor:'#000',borderColor:'#fff',borderWidth:.4},
+  setProjection:function(el){const w=el.clientWidth,h=el.clientHeight;
+   const p=d3.geo.mercator().scale(w/6.4).translate([w/2,h/1.6]);return{path:d3.geo.path().projection(p),projection:p}},
+  done:function(m){
+   zoom=d3.behavior.zoom().scaleExtent([1,12]).on('zoom',()=>m.svg.select('g').attr('transform','translate('+d3.event.translate+')scale('+d3.event.scale+')'));
+   m.svg.call(zoom);
+   m.svg.selectAll('.datamaps-subunit')
+    .on('mousemove',function(d){tip(d.id,d3.event)}).on('mouseout',()=>$('tip').style.display='none')
+    .on('click',function(d){pick(d.id)});
+   paint()}})}
+function paint(){if(!map)return;const o={};COUNTRIES.forEach(c=>o[c.id]=colorOf(c));map.updateChoropleth(o,{reset:true});legend();table()}
+function nz(v){return v==null?'—':v}
+function tip(id,e){const c=COUNTRIES.find(x=>x.id===id),t=$('tip');
+ if(!c){t.innerHTML='<b>'+id+'</b><br>Sin datos';}else{const d=DATA[id];
+  t.innerHTML=`<b>${c.n}</b> (${c.id}) · ${c.r}<br>`+(d?`4.0: ${d.a4} · madurez ${nz(d.m4)}<br>5.0: ${d.a5} · madurez ${nz(d.m5)}<br>IDH: ${nz(d.idh)}<br>${d.src} · ${d.yr} · ${d.st}`:'Sin datos')}
+ t.style.display='block';t.style.left=Math.min(e.clientX+14,innerWidth-270)+'px';t.style.top=e.clientY+14+'px'}
+
+/* ===== 5. LEYENDA ===== */
+function legend(){const L=$('layer').value;let h='';
+ if(L=='cmp')h='<b>Δ madurez (5.0−4.0):</b> <span class="sw" style="background:#e66101"></span>4.0 más madura (−50) <span class="sw" style="background:#f7f7f7"></span>igual (0) <span class="sw" style="background:#5e3c99"></span>5.0 más madura (+50)';
+ else h='<b>Madurez '+(L=='i40'?'4.0':'5.0')+' (0-100):</b> <span class="sw" style="background:#fff7bc"></span>0 <span class="sw" style="background:#41b6c4"></span>50 <span class="sw" style="background:#0c2c84"></span>100';
+ h+=' <span class="sw" style="background:'+NOD+'"></span>Sin datos <span class="sw" style="background:'+OFF+'"></span>Excluido por filtros';$('legend').innerHTML=h}
+
+/* ===== 6. FICHA ===== */
+function bar(l,v,col){return `<div>${l}: <b>${nz(v)}</b>/100</div><div class="bar"><i style="width:${v||0}%;background:${col}"></i></div>`}
+function pick(id){sel=id;const c=COUNTRIES.find(x=>x.id===id);if(!c){$('panel').innerHTML='<h2>'+id+'</h2><p>Sin datos.</p>';return}
+ const d=DATA[id],p=$('panel');
+ if(!d){p.innerHTML=`<h2>${c.n} (${c.id})</h2><p>${c.r}</p><p><b>Sin datos</b> de Industria 4.0 ni 5.0.</p>`;return}
+ const dl=delta(d);
+ p.innerHTML=`<h2>${c.n} (${c.id})</h2><p>${c.r} <span class="tag">${d.st}</span></p>
+ <h3>Industria 4.0</h3><p>Presencia/adopción: <b>${d.a4}</b></p>${bar('Madurez 4.0',d.m4,'#0c2c84')}
+ <h3>Industria 5.0</h3><p>Presencia/adopción: <b>${d.a5}</b></p>${bar('Madurez 5.0',d.m5,'#5e3c99')}
+ <p><b>Comparación:</b> ${dl==null?'sin datos suficientes':(dl>0?'5.0 supera a 4.0 en ':dl<0?'4.0 supera a 5.0 en ':'igual (')+Math.abs(dl)+' pts'+(dl==0?')':'')}</p>
+ <p><b>Desarrollo general (IDH):</b> ${nz(d.idh)}</p><p><b>Fuente:</b> ${d.src}<br><b>Año:</b> ${d.yr} · <b>Confianza:</b> ${d.conf}</p>
+ <p style="font-size:.8rem">Nota: presencia y madurez son campos distintos. Los valores DEMO no son oficiales.</p>`}
+
+/* ===== 7. TABLA ORDENABLE ===== */
+let sk='n',sd=1;
+const COLS=[['n','País'],['id','ISO-3'],['r','Región'],['a4','Adop. 4.0'],['m4','Mad. 4.0'],['a5','Adop. 5.0'],['m5','Mad. 5.0'],['dl','Δ 5.0−4.0'],['idh','IDH']];
+function rows(){return COUNTRIES.map(c=>{const d=DATA[c.id]||{};return{id:c.id,n:c.n,r:c.r,a4:d.a4||'Sin datos',m4:d.m4??null,a5:d.a5||'Sin datos',m5:d.m5??null,dl:delta(d),idh:d.idh??null}})}
+function table(){const R=rows().sort((a,b)=>{const x=a[sk],y=b[sk];if(x==null)return 1;if(y==null)return -1;return(typeof x=='number'?x-y:String(x).localeCompare(y,'es'))*sd});
+ $('tbl').innerHTML='<tr>'+COLS.map(c=>`<th tabindex=0 data-k="${c[0]}">${c[1]}${sk==c[0]?(sd>0?' ▲':' ▼'):''}</th>`).join('')+'</tr>'+
+  R.map(r=>`<tr data-id="${r.id}" style="cursor:pointer">${COLS.map(c=>`<td>${nz(r[c[0]])}</td>`).join('')}</tr>`).join('');
+ $('tbl').querySelectorAll('th').forEach(th=>{const f=()=>{const k=th.dataset.k;sd=sk==k?-sd:1;sk=k;table()};th.onclick=f;th.onkeydown=e=>{if(e.key=='Enter')f()}});
+ $('tbl').querySelectorAll('tr[data-id]').forEach(tr=>tr.onclick=()=>pick(tr.dataset.id))}
+
+/* ===== 8. CONTROLES / EXPORTAR ===== */
+COUNTRIES.forEach(c=>$('names').insertAdjacentHTML('beforeend','<option value="'+c.n+'">'));
+[...new Set(COUNTRIES.map(c=>c.r))].forEach(r=>$('freg').insertAdjacentHTML('beforeend','<option>'+r+'</option>'));
+function years(){$('fyr').innerHTML='<option value="">Todos</option>'+[...new Set(Object.values(DATA).map(d=>d.yr))].sort().map(y=>'<option>'+y+'</option>').join('')}
+['layer','freg','fad','fyr'].forEach(i=>$(i).onchange=paint);
+$('fmat').oninput=()=>{$('mv').textContent=$('fmat').value;paint()};
+$('q').onchange=()=>{const c=COUNTRIES.find(x=>x.n.toLowerCase()==$('q').value.toLowerCase());if(c)pick(c.id)};
+const zb=k=>{zoom.scale(Math.max(1,Math.min(12,zoom.scale()*k)));zoom.event(map.svg)};
+$('zin').onclick=()=>zb(1.5);$('zout').onclick=()=>zb(1/1.5);
+$('zrs').onclick=()=>{zoom.scale(1).translate([0,0]);zoom.event(map.svg)};
+function dl(name,href){const a=document.createElement('a');a.download=name;a.href=href;a.click()}
+$('csv').onclick=()=>{const R=rows(),H=['id','n','r','a4','m4','a5','m5','dl','idh'];
+ const t=H.join(',')+'\n'+R.map(r=>H.map(k=>'"'+(r[k]??'')+'"').join(',')).join('\n');
+ dl('industria4_vs_5.csv','data:text/csv;charset=utf-8,'+encodeURIComponent('\ufeff'+t))};
+$('png').onclick=()=>{const s=map.svg.node(),w=s.clientWidth,h=s.clientHeight,x=new XMLSerializer().serializeToString(s),img=new Image();
+ img.onload=()=>{const c=document.createElement('canvas');c.width=w*2;c.height=h*2;const g=c.getContext('2d');g.fillStyle='#fff';g.fillRect(0,0,c.width,c.height);g.drawImage(img,0,0,c.width,c.height);dl('mapa.png',c.toDataURL('image/png'))};
+ img.src='data:image/svg+xml;charset=utf-8,'+encodeURIComponent(x)};
+$('up').onchange=e=>{const f=e.target.files[0];if(!f)return;const r=new FileReader();r.onload=()=>{parseCSV(r.result);years();paint()};r.readAsText(f)};
+addEventListener('resize',()=>{clearTimeout(window._t);window._t=setTimeout(initMap,250)});
+years();initMap();
+</script></body></html>

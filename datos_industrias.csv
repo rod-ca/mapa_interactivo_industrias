@@ -1,0 +1,26 @@
+iso3,a40,m40,a50,m50,idh,anio,fuente,estado,confianza
+DEU,Consolidada,78,Consolidada,58.0,0.950,2024,"Oliver Wyman Industry 5.0 Index; estimación compuesta 4.0 (WEF/IFR/GII)",Estimado,Alta
+USA,Consolidada,82,Consolidada,51.3,0.927,2024,"Oliver Wyman Industry 5.0 Index; estimación compuesta 4.0 (WEF/IFR/GII)",Estimado,Alta
+JPN,Consolidada,80,Consolidada,56.9,0.920,2024,"Oliver Wyman Industry 5.0 Index; estimación compuesta 4.0 (WEF/IFR/GII)",Estimado,Alta
+KOR,Consolidada,85,Consolidada,55.0,0.929,2024,"Oliver Wyman Industry 5.0 Index; estimación compuesta 4.0 (WEF/IFR/GII)",Estimado,Alta
+SGP,Consolidada,88,Consolidada,57.0,0.946,2024,"Oliver Wyman Industry 5.0 Index; estimación compuesta 4.0 (WEF/IFR/GII)",Estimado,Alta
+SWE,Consolidada,80,Consolidada,66.1,0.952,2024,"Oliver Wyman Industry 5.0 Index; estimación compuesta 4.0 (WEF/IFR/GII)",Estimado,Alta
+FRA,Consolidada,72,Consolidada,54.6,0.910,2024,"Oliver Wyman Industry 5.0 Index; estimación compuesta 4.0 (WEF/IFR/GII)",Estimado,Alta
+GBR,Consolidada,74,Consolidada,48.2,0.946,2024,"Oliver Wyman Industry 5.0 Index; estimación compuesta 4.0 (WEF/IFR/GII)",Estimado,Alta
+CHN,Consolidada,76,Emergente,41.8,0.788,2024,"Oliver Wyman Industry 5.0 Index; estimación compuesta 4.0 (WEF/IFR/GII)",Estimado,Media
+ESP,Consolidada,66,Emergente,49.8,0.911,2024,"Oliver Wyman Industry 5.0 Index; estimación compuesta 4.0 (WEF/IFR/GII)",Estimado,Media
+ITA,Consolidada,64,Emergente,41.4,0.906,2024,"Oliver Wyman Industry 5.0 Index; estimación compuesta 4.0 (WEF/IFR/GII)",Estimado,Media
+ARE,Consolidada,70,Emergente,40.4,0.940,2024,"Oliver Wyman Industry 5.0 Index; estimación compuesta 4.0 (WEF/IFR/GII)",Estimado,Media
+TUR,Emergente,52,Incipiente,27.2,0.855,2024,"Oliver Wyman Industry 5.0 Index; estimación compuesta 4.0 (WEF/IFR/GII)",Estimado,Media
+BRA,Emergente,48,Incipiente,27.9,0.760,2024,"Oliver Wyman Industry 5.0 Index; estimación compuesta 4.0 (WEF/IFR/GII)",Estimado,Media
+MEX,Emergente,45,Incipiente,23.3,0.781,2024,"Oliver Wyman Industry 5.0 Index; estimación compuesta 4.0 (WEF/IFR/GII)",Estimado,Media
+IND,Emergente,44,Incipiente,23.3,0.644,2024,"Oliver Wyman Industry 5.0 Index; estimación compuesta 4.0 (WEF/IFR/GII)",Estimado,Media
+ARG,Emergente,42,Incipiente,18.7,0.849,2024,"Oliver Wyman Industry 5.0 Index; estimación compuesta 4.0 (WEF/IFR/GII)",Estimado,Baja
+ZAF,Emergente,38,Incipiente,20.1,0.717,2024,"Oliver Wyman Industry 5.0 Index; estimación compuesta 4.0 (WEF/IFR/GII)",Estimado,Baja
+COL,Emergente,38,Incipiente,24.6,0.758,2024,"Oliver Wyman Industry 5.0 Index; estimación compuesta 4.0 (WEF/IFR/GII)",Estimado,Baja
+CHL,Emergente,46,Incipiente,26.9,0.860,2024,"Oliver Wyman Industry 5.0 Index; estimación compuesta 4.0 (WEF/IFR/GII)",Estimado,Baja
+EGY,Incipiente,30,Incipiente,15.0,0.728,2024,"Estimación 4.0 y 5.0 por debajo del umbral del índice (no incluido en el top 92)",Estimado,Baja
+PER,Incipiente,30,Incipiente,18.0,0.762,2024,"Estimación 4.0 y 5.0 por debajo del umbral del índice (no incluido en el top 92)",Estimado,Baja
+KEN,Incipiente,24,Sin evidencia,10.0,0.601,2024,"Estimación 4.0; 5.0 sin puntuación directa en el índice global",Estimado,Baja
+NGA,Incipiente,22,Sin evidencia,8.0,0.548,2024,"Estimación 4.0; 5.0 sin puntuación directa en el índice global",Estimado,Baja
+ETH,Incipiente,15,Sin evidencia,5.0,0.492,2024,"Estimación 4.0; 5.0 sin puntuación directa en el índice global",Estimado,Baja
