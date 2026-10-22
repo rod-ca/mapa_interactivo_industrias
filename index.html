@@ -108,9 +108,13 @@ const NOD='#9e9e9e',OFF='#e6e6e6';
 const es=new Intl.DisplayNames(['es'],{type:'region'});
 const COUNTRIES=LIST.split(/\s+/).map(x=>{let n;try{n=es.of(x.slice(3,5))}catch(e){n=x.slice(0,3)}return{id:x.slice(0,3),n,r:REG[x[5]]}}).sort((a,b)=>a.n.localeCompare(b.n,'es'));
 let DATA={},sel=null;
-//function parseCSV(t){DATA={};const L=t.trim().split(/\r?\n/),H=L.shift().split(',').map(s=>s.trim());
+function parseCSV(t){DATA={};const L=t.trim().split(/\r?\n/),H=L.shift().split(',').map(s=>s.trim()); 
+ L.forEach(l=>{const c=l.split(','),o={};H.forEach((h,i)=>o[h]=(c[i]||'').trim());
+  const a=v=>AD[v]||v||'Sin datos',m=v=>v===''?null:+v;
+  DATA[o.iso3]={a4:a(o.a40),m4:m(o.m40),a5:a(o.a50),m5:m(o.m50),idh:o.idh?+o.idh:null,yr:o.anio||'2024',
+   src:o.fuente||'DEMO – ilustrativo (reemplazar)',st:o.estado||'DEMO',conf:o.confianza||'N/A'}})}
+//parseCSV(DEMO_CSV);
 
- 
  // Carga automática del CSV real desde el repositorio
 fetch('datos_industrias.csv')
   .then(response => {
@@ -125,13 +129,6 @@ fetch('datos_industrias.csv')
     console.warn("No se encontró datos.csv, usando datos DEMO", error);
     parseCSV(DEMO_CSV); // Si falla, usa los datos demo de respaldo
   });
-
- 
- L.forEach(l=>{const c=l.split(','),o={};H.forEach((h,i)=>o[h]=(c[i]||'').trim());
-  const a=v=>AD[v]||v||'Sin datos',m=v=>v===''?null:+v;
-  DATA[o.iso3]={a4:a(o.a40),m4:m(o.m40),a5:a(o.a50),m5:m(o.m50),idh:o.idh?+o.idh:null,yr:o.anio||'2024',
-   src:o.fuente||'DEMO – ilustrativo (reemplazar)',st:o.estado||'DEMO',conf:o.confianza||'N/A'}})}
-parseCSV(DEMO_CSV);
 
 /* ===== 3. COLORES ===== */
 const seq=d3.scale.linear().domain([0,50,100]).range(['#fff7bc','#41b6c4','#0c2c84']);      // madurez
